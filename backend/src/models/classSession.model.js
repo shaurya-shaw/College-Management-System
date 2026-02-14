@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { User } from "./user.model.js";
 
 const classSessionSchema = new Schema(
   {
@@ -38,6 +39,19 @@ const classSessionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Subject",
       required: true,
+    },
+    teacher: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      validate: {
+        validator: async function (value) {
+          const user = await User.findById(value).select(
+            "-password -refreshToken",
+          );
+          return user && user.role === "TEACHER";
+        },
+      },
     },
   },
   { timestamps: true },
