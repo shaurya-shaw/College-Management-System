@@ -1,4 +1,4 @@
-import { ClassSession } from "../models/classSession.model";
+import { ClassSession } from "../models/classSession.model.js";
 import { Enrollment } from "../models/enrollment.model.js";
 import { User } from "../models/user.model.js";
 

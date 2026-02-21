@@ -1,6 +1,14 @@
 import { Router } from "express";
 import { verifyJwt } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/authorize.middleware.js";
+import {
+  createClassSession,
+  deleteClassSession,
+  getAllClassSession,
+  getClassSessionById,
+  getMyClassSessions,
+  updateClassSession,
+} from "../controllers/classSession.controller.js";
 
 const router = Router();
 
@@ -9,7 +17,7 @@ router
   .post(verifyJwt, authorize("ADMIN"), createClassSession);
 router
   .route("/api/v1/class-sessions")
-  .get(verifyJwt, authorize("TEACHER"), getMyClassSessions);
+  .get(verifyJwt, authorize("TEACHER"), getMyClassSessions); //get all class sessions of the logged in teacher
 router.route("/api/v1/class-session/:id").get(verifyJwt, getClassSessionById);
 router
   .route("/api/v1/all-class-session")

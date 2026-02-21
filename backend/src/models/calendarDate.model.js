@@ -7,6 +7,19 @@ const calendarDateSchema = new Schema(
       required: true,
       unique: true,
     },
+    day: {
+      type: String,
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thrusday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+      required: true,
+    },
     isHoliday: {
       type: Boolean,
       required: true,

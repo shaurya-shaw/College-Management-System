@@ -17,8 +17,8 @@ import {
 
 const router = Router();
 
-router.route("/api/v1/login").post(loginUser);
-router.route("/api/v1/refresh-token").post(refreshAccessToken);
+router.route("/login").post(loginUser);
+router.route("/refresh-token").post(refreshAccessToken);
 
 //authenticated routes
 router.route("/api/v1/logout").post(verifyJwt, logoutUser);
