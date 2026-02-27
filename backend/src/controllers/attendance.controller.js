@@ -2,6 +2,8 @@ import { Attendance } from "../models/attendance.model.js";
 import { Enrollment } from "../models/enrollment.model.js";
 import { CalendarDate } from "../models/calendarDate.model.js";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import { calculateDistance } from "../lib/distance.js";
 
 const getStudentsAtendanceSheet = async (req, res) => {
   try {
@@ -175,9 +177,102 @@ const attendanceSummary = async (req, res) => {
   }
 };
 
+const generateAttendanceQrCode = async (req, res) => {
+  try {
+    const { classSessionId, calendarDateId } = req.params;
+
+    if (!classSessionId || !calendarDateId) {
+      return res
+        .status(400)
+        .json({ message: "class session id and calendar date id is required" });
+    }
+    const token = jwt.sign(
+      {
+        classSessionId: classSessionId,
+        calendarDateId: calendarDateId,
+      },
+      process.env.QRGENERATOR_SECRET,
+      { expiresIn: "5m" },
+    );
+    return res.status(200).json({
+      message: "QR code generated successfully",
+      token: token,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "something went wrong while generating QR code",
+      error: error.message,
+    });
+  }
+};
+
+const scanAttendanceQrCode = async (req, res) => {
+  try {
+    const { token, latitude, longitude } = req.body;
+    if (!token) {
+      return res.status(400).json({ message: "QR code token is required" });
+    }
+    const decodedToken = jwt.verify(token, process.env.QRGENERATOR_SECRET);
+
+    const enrollment = await Enrollment.findOne({
+      user: req.user._id,
+      classSession: decodedToken.classSessionId,
+    });
+    if (!enrollment) {
+      return res.status(403).json({
+        message: "you are not enrolled in this class session",
+      });
+    }
+
+    const building_latitude = parseFloat(process.env.BUILDING_LATITUDE);
+    const building_longitude = parseFloat(process.env.BUILDING_LONGITUDE);
+
+    const distance = calculateDistance(
+      building_latitude,
+      building_longitude,
+      latitude,
+      longitude,
+    );
+
+    if (distance > parseFloat(process.env.PERMITTED_RADIUS)) {
+      return res.status(403).json({
+        message: "You are outside building range",
+      });
+    }
+
+    const existingRecord = await Attendance.findOne({
+      user: req.user._id,
+      classSession: decodedToken.classSessionId,
+      calendarDate: decodedToken.calendarDateId,
+    });
+    if (existingRecord) {
+      return res.status(400).json({
+        message: "attendance already marked for today",
+      });
+    }
+    await Attendance.create({
+      user: req.user._id,
+      classSession: decodedToken.classSessionId,
+      calendarDate: decodedToken.calendarDateId,
+      isPresent: true,
+    });
+
+    return res.status(200).json({
+      message: "attendance marked successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "something went wrong while scanning QR code",
+      error: error.message,
+    });
+  }
+};
+
 export {
   getStudentsAtendanceSheet,
   markAttendance,
   myAttendance,
   attendanceSummary,
+  generateAttendanceQrCode,
+  scanAttendanceQrCode,
 };

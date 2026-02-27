@@ -3,9 +3,11 @@ import { verifyJwt } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/authorize.middleware.js";
 import {
   attendanceSummary,
+  generateAttendanceQrCode,
   getStudentsAtendanceSheet,
   markAttendance,
   myAttendance,
+  scanAttendanceQrCode,
 } from "../controllers/attendance.controller.js";
 
 const router = Router();
@@ -23,5 +25,13 @@ router
 router
   .route("/api/v1/attendance/summary/:studentId")
   .get(verifyJwt, authorize("ADMIN", "TEACHER", "STUDENT"), attendanceSummary);
+
+router
+  .route("/api/v1/attendance/generate-qr/:classSessionId/:calendarDateId")
+  .get(verifyJwt, authorize("TEACHER"), generateAttendanceQrCode);
+
+router
+  .route("/api/v1/attendance/scan-qr")
+  .post(verifyJwt, authorize("STUDENT"), scanAttendanceQrCode);
 
 export default router;
