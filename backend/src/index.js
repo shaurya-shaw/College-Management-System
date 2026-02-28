@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import cors from "cors";
 import express from "express";
 import dotenv from "dotenv";
 import { connectdb } from "./lib/db.js";
@@ -9,6 +10,7 @@ dotenv.config();
 
 const app = express();
 
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json()); //to parse the req.body which is in json
 app.use(express.urlencoded({ extended: true })); // to parse form data coming from frontend in post request
 app.use(cookieParser()); // to parse the cookies
