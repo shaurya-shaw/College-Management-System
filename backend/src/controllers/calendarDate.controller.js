@@ -2,7 +2,16 @@ import { CalendarDate } from "../models/calendarDate.model.js";
 
 const generateCalendar = async (req, res) => {
   try {
-    const { year } = req.body;
+    const { year } = req.query;
+
+    await CalendarDate.deleteMany({
+      date: {
+        $gte: new Date(`${year}-01-01`),
+        $lte: new Date(`${year}-12-31`),
+      },
+    });
+
+    const years = Number(year);
 
     if (!year || isNaN(year)) {
       return res.status(400).json({
@@ -13,27 +22,30 @@ const generateCalendar = async (req, res) => {
     // prevent duplicate year generation
     const existing = await CalendarDate.findOne({
       date: {
-        $gte: new Date(`${year}-01-01`),
-        $lte: new Date(`${year}-12-31`),
+        $gte: new Date(`${years}-01-01`),
+        $lte: new Date(`${years}-12-31`),
       },
     });
 
     if (existing) {
       return res.status(400).json({
-        message: `Calendar for ${year} already exists`,
+        message: `Calendar for ${years} already exists`,
       });
     }
 
     const dates = [];
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31);
+    const startDate = new Date(Date.UTC(years, 0, 1));
+    const endDate = new Date(Date.UTC(years, 11, 31));
 
     for (
       let date = new Date(startDate);
       date <= endDate;
-      date.setDate(date.getDate() + 1)
+      date.setUTCDate(date.getUTCDate() + 1)
     ) {
-      const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+      const dayName = date.toLocaleDateString("en-US", {
+        weekday: "long",
+        timeZone: "UTC",
+      });
 
       dates.push({
         date: new Date(date),

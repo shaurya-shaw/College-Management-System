@@ -1,3 +1,4 @@
+import { Branch } from "../models/branch.model.js";
 import { Subject } from "../models/subject.model.js";
 
 const addSubject = async (req, res) => {
@@ -6,9 +7,15 @@ const addSubject = async (req, res) => {
     if (!name || !branch) {
       return res.status(400).json({ message: "all fields are required" });
     }
+
+    const bran = await Branch.findOne({ name: branch });
+    if (!bran) {
+      return res.status(404).json({ message: "branch not found" });
+    }
+
     const subject = await Subject.create({
       name,
-      branch,
+      branch: bran._id,
     });
 
     if (!subject) {
@@ -69,7 +76,7 @@ const updateSubject = async (req, res) => {
 
 const deleteSubject = async (req, res) => {
   try {
-    await Subject.findByIdAndDelete(req.params.subjectId);
+    await Subject.findByIdAndDelete(req.params.id);
     return res.status(200).json({ message: "subject deleted successfully" });
   } catch (error) {
     return res.status(500).json({

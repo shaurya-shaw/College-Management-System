@@ -1,4 +1,7 @@
+import { Branch } from "../models/branch.model.js";
+import { Subject } from "../models/subject.model.js";
 import { ClassSession } from "../models/classSession.model.js";
+import { User } from "../models/user.model.js";
 
 const createClassSession = async (req, res) => {
   try {
@@ -6,10 +9,14 @@ const createClassSession = async (req, res) => {
     if (!subject || !teacher || !branch || !timeSlot || !day) {
       return res.status(400).json({ message: "All fields are required" });
     }
+    const bran = await Branch.findOne({ name: branch });
+    const sub = await Subject.findOne({ name: subject });
+    const teach = await User.findOne({ fullName: teacher, role: "TEACHER" });
+
     const newClassSession = await ClassSession.create({
-      subject,
-      teacher,
-      branch,
+      subject: sub._id,
+      teacher: teach._id,
+      branch: bran._id,
       timeSlot,
       day,
     });
@@ -74,14 +81,42 @@ const getClassSessionById = async (req, res) => {
 
 const getAllClassSession = async (req, res) => {
   try {
-    const classSessions = await ClassSession.find();
-    if (classSessions.length === 0) {
-      return res.status(404).json({ message: "No class sessions found" });
+    const page = parseInt(req.query.page);
+    if (page) {
+      const limit = 6;
+      const skip = (page - 1) * limit;
+
+      const classSessions = await ClassSession.find()
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .populate([
+          { path: "branch", select: "name" },
+          { path: "subject", select: "name" },
+          { path: "teacher", select: "fullName" },
+        ]);
+      if (classSessions.length === 0) {
+        return res.status(404).json({ message: "No class sessions found" });
+      }
+      return res.status(200).json({
+        message: "Class sessions retrieved successfully",
+        classSessions: classSessions,
+        totalPages: Math.ceil((await ClassSession.countDocuments()) / limit),
+        currentPage: page,
+      });
+    } else {
+      const classSessions = await ClassSession.find()
+        .sort({ createdAt: -1 })
+        .populate([
+          { path: "branch", select: "name" },
+          { path: "subject", select: "name" },
+          { path: "teacher", select: "fullName" },
+        ]);
+      return res.status(200).json({
+        message: "Class sessions retrieved successfully",
+        classSessions: classSessions,
+      });
     }
-    return res.status(200).json({
-      message: "Class sessions retrieved successfully",
-      classSessions: classSessions,
-    });
   } catch (error) {
     return res.status(500).json({
       message: "Something went wrong while retrieving class sessions",

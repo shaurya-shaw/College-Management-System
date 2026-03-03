@@ -25,14 +25,37 @@ const createBranch = async (req, res) => {
 
 const getAllBranches = async (req, res) => {
   try {
-    const branches = await Branch.find();
-    if (branches.length === 0) {
-      return res.status(404).json({ message: "no branches found" });
+    const page = Number(req.query.page);
+    const limit = 6;
+
+    if (page) {
+      const skip = (page - 1) * limit;
+
+      const branches = await Branch.find().skip(skip).limit(limit).sort({
+        createdAt: -1,
+      });
+
+      const totalBranches = await Branch.countDocuments();
+      const totalPages = Math.ceil(totalBranches / limit);
+
+      if (branches.length === 0) {
+        return res.status(404).json({ message: "no branches found" });
+      }
+      return res.status(200).json({
+        message: "branches fetched successfully",
+        branches: branches,
+        totalPages: totalPages,
+        currentPage: page,
+      });
+    } else {
+      const branches = await Branch.find().sort({
+        createdAt: -1,
+      });
+      return res.status(200).json({
+        message: "branches fetched successfully",
+        branches: branches,
+      });
     }
-    return res.status(200).json({
-      message: "branches fetched successfully",
-      branches: branches,
-    });
   } catch (error) {
     return res.status(500).json({
       message: "something went wrong while fetching branches",

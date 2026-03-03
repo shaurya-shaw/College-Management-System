@@ -1,3 +1,4 @@
+import { Branch } from "../models/branch.model.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
@@ -35,13 +36,15 @@ const addUser = async (req, res) => {
 
   try {
     const { fullName, email, password, role, branch } = req.body;
+    console.log(req.body);
 
     if (
-      [fullName, email, password, role, branch].some((field) => {
-        field.trim() == "";
-      })
+      !fullName?.trim() ||
+      !email?.trim() ||
+      !password?.trim() ||
+      !role?.trim()
     ) {
-      return res.status(401).json({ message: "all fields are required" });
+      throw new Error("All required fields must be provided");
     }
 
     const existedUser = await User.findOne({ email });
@@ -49,17 +52,23 @@ const addUser = async (req, res) => {
     if (existedUser) {
       return res.status(409).json({ message: "user already exists" });
     }
-    const user = await User.create({
+
+    const userData = {
       fullName,
       email,
       password,
       role,
-      branch,
-    });
+    };
 
-    const createdUser = await User.findById(user._id).select(
-      "-password -refreshToken",
-    );
+    if (role.toLowerCase() === "student") {
+      const bran = await Branch.findOne({ name: branch });
+      userData.branch = bran._id;
+    }
+    const user = await User.create(userData);
+
+    const createdUser = await User.findById(user._id)
+      .select("-password -refreshToken")
+      .populate({ path: "branch", select: "name" });
 
     if (!createdUser) {
       return res.status(500).json({ message: "user not created" });
@@ -268,7 +277,10 @@ const updateUserById = async (req, res) => {
 
 const getAllStudents = async (req, res) => {
   try {
-    const users = await User.find({ role: "STUDENT" });
+    const users = await User.find({ role: "STUDENT" }).populate({
+      path: "branch",
+      select: "name",
+    });
     return res
       .status(200)
       .json({ message: "students fetched successfully", users: users });
@@ -313,11 +325,11 @@ const getUserById = async (req, res) => {
 
 const deleteUserById = async (req, res) => {
   try {
-    const { userId } = req.params;
-    if (!userId) {
+    const { id } = req.params;
+    if (!id) {
       return res.status(400).json({ message: "userId is required" });
     }
-    await User.findByIdAndDelete(userId);
+    await User.findByIdAndDelete(id);
     return res.status(200).json({ message: "user deleted successfully" });
   } catch (error) {
     return res.status(500).json({

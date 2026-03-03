@@ -13,7 +13,7 @@ const calendarDateSchema = new Schema(
         "Monday",
         "Tuesday",
         "Wednesday",
-        "Thrusday",
+        "Thursday",
         "Friday",
         "Saturday",
         "Sunday",

@@ -29,6 +29,9 @@ const userSchema = new mongoose.Schema(
     branch: {
       type: Schema.Types.ObjectId,
       ref: "Branch",
+      required: function () {
+        return this.role === "STUDENT";
+      },
     },
   },
   { timestamps: true },
