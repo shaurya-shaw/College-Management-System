@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   type LoginForm = {
-    email: String;
-    password: String;
+    email: string;
+    password: string;
   };
 
   const { register, handleSubmit } = useForm<LoginForm>();

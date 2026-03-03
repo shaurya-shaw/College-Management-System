@@ -1,1 +1,144 @@
 @import "tailwindcss";
+
+/* utility for hiding native scrollbars while keeping scrolling functional */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* ── react-big-calendar overrides ─────────────────────────── */
+
+/* Kill default borders/backgrounds so Tailwind controls layout */
+.rbc-calendar {
+  font-family: inherit;
+  height: 100%;
+}
+
+/* Month view */
+.rbc-month-view {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0;
+  flex: 1;
+}
+
+/* Day header row (MON, TUE …) */
+.rbc-header {
+  padding: 10px 0 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  background: #f9fafb !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #374151 !important;
+}
+
+/* Weekend header labels */
+.rbc-header:nth-child(6),
+.rbc-header:nth-child(7) {
+  color: #dc2626 !important;
+}
+
+/* Row borders */
+.rbc-month-row {
+  border-top: 1px solid #e5e7eb !important;
+}
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #e5e7eb !important;
+}
+
+/* Off-range days (prev/next month) */
+.rbc-off-range-bg {
+  background: #f9fafb !important;
+}
+.rbc-off-range .rbc-date-cell a {
+  color: #9ca3af !important;
+}
+
+/* Weekend date numbers */
+.rbc-day-bg.rbc-weekend-bg {
+  /* handled via dayPropGetter */
+}
+
+/* Date number */
+.rbc-date-cell {
+  padding: 6px 10px !important;
+  text-align: center !important;
+}
+.rbc-date-cell a {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  text-decoration: none !important;
+}
+
+/* Saturday & Sunday numbers — red, like the screenshot */
+.rbc-header:nth-child(6)
+  ~ .rbc-row-bg
+  .rbc-day-bg:nth-child(6)
+  .rbc-date-cell
+  a,
+.rbc-header:nth-child(7)
+  ~ .rbc-row-bg
+  .rbc-day-bg:nth-child(7)
+  .rbc-date-cell
+  a {
+  color: #dc2626 !important;
+}
+
+/* Today highlight override (we use dayPropGetter for full blue cell) */
+.rbc-today {
+  background: #2563eb !important;
+}
+.rbc-today .rbc-date-cell a {
+  color: #ffffff !important;
+}
+
+/* Events */
+.rbc-event {
+  border-radius: 4px !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  padding: 2px 6px !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.rbc-event:focus {
+  outline: none !important;
+}
+.rbc-event-label {
+  display: none !important;
+}
+
+/* Remove the "show more" blue link default */
+.rbc-show-more {
+  font-size: 0.7rem !important;
+  color: #2563eb !important;
+  background: transparent !important;
+}
+
+/* Row content height — make cells taller like screenshot */
+.rbc-month-row .rbc-row-content {
+  min-height: 80px;
+}
+
+/* Toolbar — hidden, we use CustomToolbar */
+.rbc-toolbar {
+  display: none !important;
+}
+
+/* Tall cells */
+.rbc-month-row {
+  min-height: 90px !important;
+}
+.rbc-day-bg {
+  min-height: 90px !important;
+}
+.rbc-month-row .rbc-row-bg > .rbc-day-bg > div {
+  height: 100%;
+  min-height: 90px;
+  display: block;
+}
