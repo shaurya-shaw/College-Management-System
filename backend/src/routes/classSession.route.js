@@ -7,6 +7,7 @@ import {
   getAllClassSession,
   getClassSessionById,
   getMyClassSessions,
+  getTeacherSubjects,
   updateClassSession,
 } from "../controllers/classSession.controller.js";
 
@@ -16,7 +17,7 @@ router
   .route("/api/v1/class-session")
   .post(verifyJwt, authorize("ADMIN"), createClassSession);
 router
-  .route("/api/v1/class-sessions")
+  .route("/api/v1/class-sessions/:day")
   .get(verifyJwt, authorize("TEACHER"), getMyClassSessions); //get all class sessions of the logged in teacher
 router.route("/api/v1/class-session/:id").get(verifyJwt, getClassSessionById);
 router
@@ -28,5 +29,9 @@ router
 router
   .route("/api/v1/class-session/:id")
   .delete(verifyJwt, authorize("ADMIN"), deleteClassSession);
+
+router
+  .route("/api/v1/class-session/getSubjects")
+  .get(verifyJwt, authorize("TEACHER"), getTeacherSubjects); //get all Subjects of the logged in teacher
 
 export default router;
