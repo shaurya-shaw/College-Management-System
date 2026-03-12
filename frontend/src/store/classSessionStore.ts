@@ -16,6 +16,7 @@ type ClassSessionStore = {
   fetchClassSession: (page?: number) => Promise<void>;
   addClassSession: (data: ClassSessionProps) => Promise<void>;
   DeleteClassSession: (id: string) => Promise<void>;
+  fetchTeacherSession: (day: string) => Promise<void>;
 };
 
 export const useClassSessionStore = create<ClassSessionStore>((set) => ({
@@ -54,6 +55,15 @@ export const useClassSessionStore = create<ClassSessionStore>((set) => ({
       set((state) => ({
         classSession: state.classSession.filter((t) => t._id !== id),
       }));
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  fetchTeacherSession: async (day) => {
+    try {
+      const res = await api.get(`/class-sessions?day=${day}`);
+      console.log(res.data);
+      set({ classSession: res.data.classSessions || [] });
     } catch (error) {
       console.log(error);
     }

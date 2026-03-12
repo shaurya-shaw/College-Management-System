@@ -40,7 +40,7 @@ const createClassSession = async (req, res) => {
 const getMyClassSessions = async (req, res) => {
   try {
     const teacherId = req.user._id;
-    const { day } = req.params;
+    const day = req.query.day || "MONDAY";
     const classSessions = await ClassSession.find({
       teacher: teacherId,
       day: day,
@@ -55,9 +55,6 @@ const getMyClassSessions = async (req, res) => {
       },
     ]);
 
-    if (classSessions.length === 0) {
-      return res.status(404).json({ message: "No class sessions found" });
-    }
     return res.status(200).json({
       message: "Class sessions retrieved successfully",
       classSessions: classSessions,

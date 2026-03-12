@@ -17,7 +17,7 @@ router
   .route("/api/v1/class-session")
   .post(verifyJwt, authorize("ADMIN"), createClassSession);
 router
-  .route("/api/v1/class-sessions/:day")
+  .route("/api/v1/class-sessions")
   .get(verifyJwt, authorize("TEACHER"), getMyClassSessions); //get all class sessions of the logged in teacher
 router.route("/api/v1/class-session/:id").get(verifyJwt, getClassSessionById);
 router

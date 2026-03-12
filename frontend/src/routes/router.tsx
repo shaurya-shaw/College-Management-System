@@ -12,6 +12,8 @@ import StudentPage from "../pages/students/StudentPage";
 import ClassSessionPage from "../pages/classSessions/ClassSessionPage";
 
 import CalendarPage from "../pages/calendarDate/CalendarPage";
+import TeacherDashboard from "../pages/Dashboard/TeacherDashboard";
+import MyClasses from "../pages/teacherContent/MyClasses";
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +44,10 @@ export const router = createBrowserRouter([
         <TeacherLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { path: "dashboard", element: <TeacherDashboard /> },
+      { path: "myClasses", element: <MyClasses /> },
+    ],
   },
   {
     path: "/student",
