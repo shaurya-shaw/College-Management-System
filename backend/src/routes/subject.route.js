@@ -7,6 +7,7 @@ import {
   getAllSubjects,
   getMySubjects,
   getSubjectById,
+  getTeacherSubjects,
   updateSubject,
 } from "../controllers/subject.controller.js";
 
@@ -29,5 +30,9 @@ router
   .route("/api/v1/all-subjects")
   .get(verifyJwt, authorize("ADMIN"), getAllSubjects);
 router.route("/api/v1/subject/:id").get(verifyJwt, getSubjectById);
+
+router
+  .route("/api/v1/getTeacherSubjects")
+  .get(verifyJwt, authorize("TEACHER"), getTeacherSubjects); //get all Subjects of the logged in teacher
 
 export default router;

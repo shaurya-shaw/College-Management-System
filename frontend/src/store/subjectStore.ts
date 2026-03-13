@@ -17,6 +17,7 @@ type BranchStore = {
   fetchSubjects: () => Promise<void>;
   addSubject: (data: SubjectProps) => Promise<void>;
   deleteSubject: (id: string) => Promise<void>;
+  teacherSubject: () => Promise<void>;
 };
 
 export const useSubjectStore = create<BranchStore>((set) => ({
@@ -43,6 +44,15 @@ export const useSubjectStore = create<BranchStore>((set) => ({
     try {
       await api.delete(`/delete-subject/${id}`);
       set((state) => ({ subject: state.subject.filter((t) => t._id !== id) }));
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  teacherSubject: async () => {
+    try {
+      const res = await api.get("/getTeacherSubjects");
+      console.log(res.data);
+      set({ subject: res.data.subjects || [] });
     } catch (error) {
       console.log(error);
     }

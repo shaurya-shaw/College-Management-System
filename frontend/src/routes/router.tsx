@@ -14,6 +14,8 @@ import ClassSessionPage from "../pages/classSessions/ClassSessionPage";
 import CalendarPage from "../pages/calendarDate/CalendarPage";
 import TeacherDashboard from "../pages/Dashboard/TeacherDashboard";
 import MyClasses from "../pages/teacherContent/MyClasses";
+import MySubjects from "../pages/teacherContent/MySubjects";
+import MyCalendar from "../pages/teacherContent/MyCalendar";
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +49,8 @@ export const router = createBrowserRouter([
     children: [
       { path: "dashboard", element: <TeacherDashboard /> },
       { path: "myClasses", element: <MyClasses /> },
+      { path: "subjects", element: <MySubjects /> },
+      { path: "calendarDate", element: <MyCalendar /> },
     ],
   },
   {

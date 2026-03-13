@@ -185,29 +185,6 @@ const deleteClassSession = async (req, res) => {
   }
 };
 
-const getTeacherSubjects = async (req, res) => {
-  try {
-    const subjectIds = await ClassSession.distinct("subject", {
-      teacher: req.user._id,
-    });
-    const subjects = await Subject.find({ _id: { $in: subjectIds } }).populate({
-      path: "branch",
-      select: "name",
-    });
-    if (subjects.length == 0) {
-      return res.status(404).json({ message: "subjects not found" });
-    }
-    return res
-      .status(200)
-      .json({ message: "subjects fetched successfully", subjects: subjects });
-  } catch (error) {
-    return res.status(500).json({
-      message: "something went wrong while fetching subjects",
-      error: error.message,
-    });
-  }
-};
-
 export {
   createClassSession,
   getMyClassSessions,
@@ -215,5 +192,4 @@ export {
   getAllClassSession,
   updateClassSession,
   deleteClassSession,
-  getTeacherSubjects,
 };

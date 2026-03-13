@@ -4,6 +4,8 @@ import { CalendarDate } from "../models/calendarDate.model.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { calculateDistance } from "../lib/distance.js";
+import { ClassSession } from "../models/classSession.model.js";
+import { User } from "../models/user.model.js";
 
 const getStudentsAtendanceSheet = async (req, res) => {
   try {
@@ -13,17 +15,37 @@ const getStudentsAtendanceSheet = async (req, res) => {
       return res.status(400).json({ message: "class session id is required" });
     }
 
-    const today = new Date().toISOString().split("T")[0];
+    // const today = new Date();
 
-    const day = await CalendarDate.findOne({ date: today });
+    const today = new Date("2026-03-13"); // for testing
+
+    const startOfDay = new Date(today);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const day = await CalendarDate.findOne({
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    console.log(day);
+
+    console.log(day.isHoliday);
 
     if (day.isHoliday) {
       return res.status(400).json({ message: "today is a holiday" });
     }
 
-    const enrollments = await Enrollment.find({
-      classSession: classSessionId,
-    }).populate({ path: "user", select: "fullName email" });
+    const classes = await ClassSession.findById(classSessionId);
+
+    if (!classes) {
+      return res.status(404).json({ message: "class session not found" });
+    }
+
+    const enrollments = await User.find({
+      branch: classes.branch,
+    });
 
     if (!enrollments) {
       return res.status(404).json({ message: "no enrollments found" });
@@ -31,17 +53,18 @@ const getStudentsAtendanceSheet = async (req, res) => {
 
     const existingStudents = await Attendance.find({
       classSession: classSessionId,
-      calendarDate: today,
+      calendarDate: day._id,
     });
 
     const sheet = enrollments.map((enroll) => {
       const records = existingStudents.find(
-        (rec) => rec.user.toString() === enroll.user._id.toString(),
+        (rec) => rec.user.toString() === enroll._id.toString(),
       );
 
       return {
-        studentId: enroll.user._id,
-        name: enroll.user.fullName,
+        studentId: enroll._id,
+        email: enroll.email,
+        name: enroll.fullName,
         isPresent: records ? records.isPresent : false,
       };
     });
@@ -60,7 +83,7 @@ const getStudentsAtendanceSheet = async (req, res) => {
 
 const markAttendance = async (req, res) => {
   try {
-    const { classSessionId, studentId, calendarDateId, isPresent } = req.body;
+    const { classSessionId, studentId, date, isPresent } = req.body;
 
     if (!classSessionId) {
       return res.status(400).json({
@@ -68,11 +91,49 @@ const markAttendance = async (req, res) => {
       });
     }
 
+    if (!studentId) {
+      return res.status(400).json({
+        message: "student id is required",
+      });
+    }
+
+    if (!date) {
+      return res.status(400).json({
+        message: "date is required",
+      });
+    }
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const calendarDate = await CalendarDate.findOne({
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    if (!calendarDate) {
+      return res.status(400).json({
+        message: "date not found",
+      });
+    }
+
+    const now = new Date("2026-03-13"); // for testing
+    const date1 = new Date(date);
+    const diff = Math.abs(now - date1);
+
+    if (diff > 24 * 60 * 60 * 1000) {
+      return res.status(400).json({
+        message: "Attendance cannot be marked after 24 hours",
+      });
+    }
+
     await Attendance.updateOne(
       {
         user: studentId,
         classSession: classSessionId,
-        calendarDate: calendarDateId,
+        calendarDate: calendarDate._id,
       },
       {
         $set: { isPresent: isPresent },
