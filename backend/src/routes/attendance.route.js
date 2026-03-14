@@ -27,11 +27,11 @@ router
   .get(verifyJwt, authorize("ADMIN", "TEACHER", "STUDENT"), attendanceSummary);
 
 router
-  .route("/api/v1/attendance/generate-qr/:classSessionId/:calendarDateId")
+  .route("/api/v1/generate-qr/:classSessionId/:date")
   .get(verifyJwt, authorize("TEACHER"), generateAttendanceQrCode);
 
 router
-  .route("/api/v1/attendance/scan-qr")
+  .route("/api/v1/scan-qr")
   .post(verifyJwt, authorize("STUDENT"), scanAttendanceQrCode);
 
 export default router;

@@ -10,13 +10,13 @@ import AllSubjectsList from "../pages/subjects/AllSubjectsList";
 import TeacherPage from "../pages/teachers/TeacherPage";
 import StudentPage from "../pages/students/StudentPage";
 import ClassSessionPage from "../pages/classSessions/ClassSessionPage";
-
 import CalendarPage from "../pages/calendarDate/CalendarPage";
 import TeacherDashboard from "../pages/Dashboard/TeacherDashboard";
 import MyClasses from "../pages/teacherContent/MyClasses";
 import MySubjects from "../pages/teacherContent/MySubjects";
 import MyCalendar from "../pages/teacherContent/MyCalendar";
 import MarkAttendance from "../pages/teacherContent/MarkAttendance";
+import QrAttendance from "../pages/teacherContent/QrAttendance";
 
 export const router = createBrowserRouter([
   {
@@ -53,6 +53,7 @@ export const router = createBrowserRouter([
       { path: "subjects", element: <MySubjects /> },
       { path: "calendarDate", element: <MyCalendar /> },
       { path: "attendance/:classId", element: <MarkAttendance /> },
+      { path: "QrAttendance/:classId", element: <QrAttendance /> },
     ],
   },
   {

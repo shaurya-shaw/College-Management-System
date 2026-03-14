@@ -11,6 +11,7 @@ export type AttendanceProps = {
 
 export type AttendanceStore = {
   attendance: AttendanceProps[];
+  token: string;
   loading: boolean;
   error: string | null;
   success: string | null;
@@ -23,10 +24,17 @@ export type AttendanceStore = {
     isPresent: boolean,
     date: Date,
   ) => Promise<void>;
+  generateQrCode: (classId: string, date: Date) => Promise<void>;
+  scanQrCode: (
+    token: string,
+    latitude: number,
+    longitude: number,
+  ) => Promise<void>;
 };
 
 export const useAttendanceStore = create<AttendanceStore>((set) => ({
   attendance: [],
+  token: "",
   loading: false,
   error: null,
   success: null,
@@ -75,6 +83,39 @@ export const useAttendanceStore = create<AttendanceStore>((set) => ({
         ? error.response?.data?.message
         : "Failed to mark attendance";
       set({ error: msg || "Failed to mark attendance" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+  generateQrCode: async (classId: string, date: Date) => {
+    try {
+      set({ loading: true });
+      const response = await api.get(`/generate-qr/${classId}/${date}`);
+      set({ token: response.data.token });
+      set({ success: response.data.message || "QR code generated!" });
+    } catch (error: unknown) {
+      const msg = axios.isAxiosError(error)
+        ? error.response?.data?.message
+        : "Failed to generate QR code";
+      set({ error: msg || "Failed to generate QR code" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+  scanQrCode: async (token: string, latitude: number, longitude: number) => {
+    try {
+      set({ loading: true });
+      const response = await api.post(`/scan-qr`, {
+        token,
+        latitude,
+        longitude,
+      });
+      set({ success: response.data.message || "QR code scanned!" });
+    } catch (error: unknown) {
+      const msg = axios.isAxiosError(error)
+        ? error.response?.data?.message
+        : "Failed to scan QR code";
+      set({ error: msg || "Failed to scan QR code" });
     } finally {
       set({ loading: false });
     }

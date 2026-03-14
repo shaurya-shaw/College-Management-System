@@ -17,7 +17,7 @@ const MarkAttendance = () => {
   } = useAttendanceStore();
   const { classId } = useParams();
 
-  const now = new Date("2026-03-13");
+  const now = new Date("2026-03-27"); //for testing
 
   useEffect(() => {
     if (classId) fetchAttendance(classId);
@@ -25,7 +25,20 @@ const MarkAttendance = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Attendance</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold mb-4">Attendance</h1>
+        <Link
+          to={`/teacher/QrAttendance/${classId}`}
+          className="bg-indigo-500 text-amber-50 p-2 pl-3 pr-3 rounded-3xl ml-4 hover:bg-indigo-700 transition-colors duration-300 cursor-pointer"
+        >
+          QR attendance
+        </Link>
+      </div>
+      {loading && (
+        <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-10">
+          <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+        </div>
+      )}
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-100 text-left">
@@ -34,12 +47,6 @@ const MarkAttendance = () => {
             <th className="p-3">Status</th>
           </tr>
         </thead>
-
-        {loading && (
-          <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-10">
-            <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
-          </div>
-        )}
 
         <tbody>
           {attendance.map((student, key) => (

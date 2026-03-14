@@ -15,9 +15,7 @@ const getStudentsAtendanceSheet = async (req, res) => {
       return res.status(400).json({ message: "class session id is required" });
     }
 
-    // const today = new Date();
-
-    const today = new Date("2026-03-13"); // for testing
+    const today = new Date("2026-03-27"); // for testing
 
     const startOfDay = new Date(today);
     startOfDay.setHours(0, 0, 0, 0);
@@ -120,11 +118,17 @@ const markAttendance = async (req, res) => {
       });
     }
 
-    const now = new Date("2026-03-13"); // for testing
-    const date1 = new Date(date);
-    const diff = Math.abs(now - date1);
+    const day = new Date(date)
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toUpperCase();
 
-    if (diff > 24 * 60 * 60 * 1000) {
+    const realDay = await ClassSession.findById(classSessionId)
+      .select("day")
+      .lean();
+    console.log(realDay.day);
+    console.log(day);
+
+    if (day !== realDay.day) {
       return res.status(400).json({
         message: "Attendance cannot be marked after 24 hours",
       });
@@ -241,17 +245,50 @@ const attendanceSummary = async (req, res) => {
 
 const generateAttendanceQrCode = async (req, res) => {
   try {
-    const { classSessionId, calendarDateId } = req.params;
+    const { classSessionId, date } = req.params;
 
-    if (!classSessionId || !calendarDateId) {
+    if (!classSessionId || !date) {
       return res
         .status(400)
-        .json({ message: "class session id and calendar date id is required" });
+        .json({ message: "class session id and calendar date  is required" });
     }
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const calendarDate = await CalendarDate.findOne({
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    if (!calendarDate) {
+      return res.status(400).json({
+        message: "date not found",
+      });
+    }
+
+    const day = new Date(date)
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toUpperCase();
+
+    const realDay = await ClassSession.findById(classSessionId)
+      .select("day")
+      .lean();
+    console.log(realDay.day);
+    console.log(day);
+
+    if (day !== realDay.day) {
+      return res.status(400).json({
+        message: "Attendance cannot be marked after 24 hours",
+      });
+    }
+
     const token = jwt.sign(
       {
         classSessionId: classSessionId,
-        calendarDateId: calendarDateId,
+        calendarDateId: calendarDate._id,
       },
       process.env.QRGENERATOR_SECRET,
       { expiresIn: "5m" },
@@ -275,16 +312,6 @@ const scanAttendanceQrCode = async (req, res) => {
       return res.status(400).json({ message: "QR code token is required" });
     }
     const decodedToken = jwt.verify(token, process.env.QRGENERATOR_SECRET);
-
-    const enrollment = await Enrollment.findOne({
-      user: req.user._id,
-      classSession: decodedToken.classSessionId,
-    });
-    if (!enrollment) {
-      return res.status(403).json({
-        message: "you are not enrolled in this class session",
-      });
-    }
 
     const building_latitude = parseFloat(process.env.BUILDING_LATITUDE);
     const building_longitude = parseFloat(process.env.BUILDING_LONGITUDE);
