@@ -64,7 +64,7 @@ const getStudentsAtendanceSheet = async (req, res) => {
       return {
         studentId: enroll._id,
         email: enroll.email,
-        name: enroll.fullName,
+        fullName: enroll.fullName,
         isPresent: records ? records.isPresent : false,
       };
     });
@@ -83,7 +83,8 @@ const getStudentsAtendanceSheet = async (req, res) => {
 
 const markAttendance = async (req, res) => {
   try {
-    const { classSessionId, studentId, date, isPresent } = req.body;
+    const { classSessionId } = req.params;
+    const { studentId, date, isPresent } = req.body;
 
     if (!classSessionId) {
       return res.status(400).json({

@@ -16,6 +16,7 @@ import TeacherDashboard from "../pages/Dashboard/TeacherDashboard";
 import MyClasses from "../pages/teacherContent/MyClasses";
 import MySubjects from "../pages/teacherContent/MySubjects";
 import MyCalendar from "../pages/teacherContent/MyCalendar";
+import MarkAttendance from "../pages/teacherContent/MarkAttendance";
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
       { path: "myClasses", element: <MyClasses /> },
       { path: "subjects", element: <MySubjects /> },
       { path: "calendarDate", element: <MyCalendar /> },
+      { path: "attendance/:classId", element: <MarkAttendance /> },
     ],
   },
   {

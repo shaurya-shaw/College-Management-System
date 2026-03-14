@@ -1,13 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import NavBar from "../components/NavBar";
-import {
-  BookOpen,
-  Calendar1Icon,
-  ClipboardCheck,
-  HomeIcon,
-  SchoolIcon,
-  User2Icon,
-} from "lucide-react";
+import { BookOpen, Calendar1Icon, HomeIcon, SchoolIcon } from "lucide-react";
 
 const TeacherLayout = () => {
   return (
@@ -19,7 +12,7 @@ const TeacherLayout = () => {
           <nav className="flex flex-col gap-4 text-black">
             <NavLink
               className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-              to="/admin/dashboard"
+              to="/teacher/dashboard"
             >
               <HomeIcon className="inline-block mr-2 opacity-60" />
               Home
@@ -40,24 +33,10 @@ const TeacherLayout = () => {
             </NavLink>
             <NavLink
               className="border-gray-500 hover:bg-green-100 hover:rounded-2xl  p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-              to="/teacher/attendance"
-            >
-              <ClipboardCheck className="inline-block mr-2 opacity-60" />
-              Mark Attendance
-            </NavLink>
-            <NavLink
-              className="border-gray-500 hover:bg-green-100 hover:rounded-2xl  p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
               to="/teacher/calendarDate"
             >
               <Calendar1Icon className="inline-block mr-2 opacity-60" />
               Calendar
-            </NavLink>
-            <NavLink
-              className="border-gray-500 hover:bg-green-100 hover:rounded-2xl  p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-              to="/teacher/profile"
-            >
-              <User2Icon className="inline-block mr-2 opacity-60" />
-              Profile
             </NavLink>
           </nav>
         </aside>

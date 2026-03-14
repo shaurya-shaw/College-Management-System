@@ -19,7 +19,7 @@ router
   .route("/api/v1/attendance/me")
   .get(verifyJwt, authorize("STUDENT"), myAttendance);
 router
-  .route("/api/v1/attendance/mark")
+  .route("/api/v1/attendance/:classSessionId")
   .post(verifyJwt, authorize("TEACHER"), markAttendance);
 
 router

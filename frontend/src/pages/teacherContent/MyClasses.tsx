@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useClassSessionStore } from "../../store/classSessionStore";
+import { Link } from "react-router-dom";
 
 const MyClasses = () => {
   const { fetchTeacherSession, classSession } = useClassSessionStore();
@@ -43,6 +44,7 @@ const MyClasses = () => {
             <th className="text-left p-3">Branch</th>
             <th className="text-left p-3 ">Subject</th>
             <th className="text-right p-3 ">Timeslot</th>
+            <th className="text-right p-3 ">Attendance</th>
           </tr>
         </thead>
         <tbody>
@@ -62,6 +64,14 @@ const MyClasses = () => {
                   : teach.subject?.name}
               </td>
               <td className="p-3 text-right">{teach.timeSlot}</td>
+              <td className="p-3 text-right">
+                <Link
+                  to={`/teacher/attendance/${teach._id}`}
+                  className="px-3 py-1 bg-blue-500 text-white  rounded-2xl hover:bg-blue-600"
+                >
+                  Mark
+                </Link>
+              </td>
             </tr>
           ))}
         </tbody>
