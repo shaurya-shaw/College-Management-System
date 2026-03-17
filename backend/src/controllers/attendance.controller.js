@@ -167,7 +167,9 @@ const myAttendance = async (req, res) => {
         select: "timeSlot day",
         populate: [{ path: "subject", select: "name" }],
       })
-      .populate({ path: "calendarDate", select: "date" });
+      .populate({ path: "calendarDate", select: "date" })
+      .sort({ createdAt: -1 })
+      .lean();
     if (allAttendance.length == 0) {
       return res.status(404).json({ message: "no attendance records found" });
     }

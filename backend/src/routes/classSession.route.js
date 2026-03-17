@@ -7,6 +7,7 @@ import {
   getAllClassSession,
   getClassSessionById,
   getMyClassSessions,
+  studentClassSession,
   updateClassSession,
 } from "../controllers/classSession.controller.js";
 
@@ -28,5 +29,9 @@ router
 router
   .route("/api/v1/class-session/:id")
   .delete(verifyJwt, authorize("ADMIN"), deleteClassSession);
+
+router
+  .route("/api/v1/student-class-sessions")
+  .get(verifyJwt, authorize("STUDENT"), studentClassSession);
 
 export default router;

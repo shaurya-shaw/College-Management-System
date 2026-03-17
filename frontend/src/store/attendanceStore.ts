@@ -9,8 +9,35 @@ export type AttendanceProps = {
   isPresent: boolean;
 };
 
+export type Subject = {
+  _id: string;
+  name: string;
+};
+
+export type ClassSession = {
+  _id: string;
+  day: string;
+  timeSlot: string;
+  subject: Subject;
+};
+
+export type CalendarDate = {
+  _id: string;
+  date: string;
+};
+
+export type myAttendanceProps = {
+  _id: string;
+  classSession: ClassSession;
+  calendarDate: CalendarDate;
+  isPresent: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AttendanceStore = {
   attendance: AttendanceProps[];
+  myAttendance: myAttendanceProps[];
   token: string;
   loading: boolean;
   error: string | null;
@@ -18,6 +45,7 @@ export type AttendanceStore = {
   clearError: () => void;
   clearSuccess: () => void;
   fetchAttendance: (classId: string) => Promise<void>;
+  fetchMyAttendance: () => Promise<void>;
   markAttendance: (
     classId: string,
     studentId: string,
@@ -34,6 +62,7 @@ export type AttendanceStore = {
 
 export const useAttendanceStore = create<AttendanceStore>((set) => ({
   attendance: [],
+  myAttendance: [],
   token: "",
   loading: false,
   error: null,
@@ -118,6 +147,22 @@ export const useAttendanceStore = create<AttendanceStore>((set) => ({
       set({ error: msg || "Failed to scan QR code" });
     } finally {
       set({ loading: false });
+    }
+  },
+  fetchMyAttendance: async () => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.get("/my-attendance");
+      set({
+        myAttendance: res.data.attendance,
+        loading: false,
+        success: res.data.message || "Attendance fetched successfully",
+      });
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || "Something went wrong",
+        loading: false,
+      });
     }
   },
 }));

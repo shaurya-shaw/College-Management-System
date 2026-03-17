@@ -16,7 +16,7 @@ router
   .route("/api/v1/attendance/:classSessionId")
   .get(verifyJwt, authorize("ADMIN", "TEACHER"), getStudentsAtendanceSheet);
 router
-  .route("/api/v1/attendance/me")
+  .route("/api/v1/my-attendance")
   .get(verifyJwt, authorize("STUDENT"), myAttendance);
 router
   .route("/api/v1/attendance/:classSessionId")

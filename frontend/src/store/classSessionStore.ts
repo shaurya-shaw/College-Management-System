@@ -6,7 +6,10 @@ export type ClassSessionProps = {
   subject: { name: string; _id: string } | string;
   day: string;
   timeSlot: string;
-  teacher: { fullName: string; _id: string } | string;
+  teacher:
+    | { fullName: string; _id: string }
+    | string
+    | { fullName: string; _id: string; email: string };
   _id: string;
 };
 
@@ -17,6 +20,7 @@ type ClassSessionStore = {
   addClassSession: (data: ClassSessionProps) => Promise<void>;
   DeleteClassSession: (id: string) => Promise<void>;
   fetchTeacherSession: (day: string) => Promise<void>;
+  fetchStudentSession: (day: string) => Promise<void>;
 };
 
 export const useClassSessionStore = create<ClassSessionStore>((set) => ({
@@ -62,6 +66,15 @@ export const useClassSessionStore = create<ClassSessionStore>((set) => ({
   fetchTeacherSession: async (day) => {
     try {
       const res = await api.get(`/class-sessions?day=${day}`);
+      console.log(res.data);
+      set({ classSession: res.data.classSessions || [] });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  fetchStudentSession: async (day) => {
+    try {
+      const res = await api.get(`/student-class-sessions?day=${day}`);
       console.log(res.data);
       set({ classSession: res.data.classSessions || [] });
     } catch (error) {

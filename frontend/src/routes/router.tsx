@@ -17,6 +17,10 @@ import MySubjects from "../pages/teacherContent/MySubjects";
 import MyCalendar from "../pages/teacherContent/MyCalendar";
 import MarkAttendance from "../pages/teacherContent/MarkAttendance";
 import QrAttendance from "../pages/teacherContent/QrAttendance";
+import StudentDashboard from "../pages/Dashboard/StudentDashboard";
+import MyCourses from "../pages/studentContent/MyCourses";
+import StudentClasses from "../pages/studentContent/StudentClasses";
+import MyAttendance from "../pages/studentContent/MyAttendance";
 
 export const router = createBrowserRouter([
   {
@@ -63,5 +67,12 @@ export const router = createBrowserRouter([
         <StudentLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { path: "dashboard", element: <StudentDashboard /> },
+      { path: "courses", element: <MyCourses /> },
+      { path: "calendar", element: <MyCalendar /> },
+      { path: "classes", element: <StudentClasses /> },
+      { path: "myAttendance", element: <MyAttendance /> },
+    ],
   },
 ]);

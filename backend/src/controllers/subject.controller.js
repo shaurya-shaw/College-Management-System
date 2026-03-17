@@ -34,13 +34,38 @@ const addSubject = async (req, res) => {
 };
 
 const getMySubjects = async (req, res) => {
-  const subjects = await Subject.find({ branch: req.user.branch });
-  if (subjects.length == 0) {
+  const sessions = await ClassSession.find({
+    branch: req.user.branch,
+  })
+    .populate({ path: "teacher", select: "fullName email" })
+    .populate({ path: "subject", select: "name" })
+    .lean();
+
+  console.log(sessions);
+
+  const uniqueSubjects = new Map();
+
+  sessions.forEach((session) => {
+    const subjectId = session.subject._id.toString();
+
+    if (!uniqueSubjects.has(subjectId)) {
+      uniqueSubjects.set(subjectId, {
+        subject: session.subject,
+        teacher: session.teacher,
+      });
+    }
+  });
+
+  const subjects = Array.from(uniqueSubjects.values());
+
+  if (subjects.length === 0) {
     return res.status(404).json({ message: "subjects not found" });
   }
-  return res
-    .status(200)
-    .json({ message: "subjects fetched successfully", subjects: subjects });
+
+  return res.status(200).json({
+    message: "subjects fetched successfully",
+    subjects: subjects,
+  });
 };
 
 const updateSubject = async (req, res) => {

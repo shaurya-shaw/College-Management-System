@@ -2,6 +2,7 @@ import { Branch } from "../models/branch.model.js";
 import { Subject } from "../models/subject.model.js";
 import { ClassSession } from "../models/classSession.model.js";
 import { User } from "../models/user.model.js";
+import { Attendance } from "../models/attendance.model.js";
 
 const createClassSession = async (req, res) => {
   try {
@@ -185,6 +186,31 @@ const deleteClassSession = async (req, res) => {
   }
 };
 
+const studentClassSession = async (req, res) => {
+  try {
+    const day = req.query.day || "MONDAY";
+
+    const sessions = await ClassSession.find({
+      day: day,
+      branch: req.user.branch,
+    })
+      .populate({ path: "subject", select: "name" })
+      .populate({ path: "teacher", select: "fullName email" })
+      .populate({ path: "branch", select: "name" })
+      .lean();
+
+    return res.status(200).json({
+      message: "class sessions retrieved successfully",
+      classSessions: sessions,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "something went wrong while retrieving class sessions",
+      error: error.message,
+    });
+  }
+};
+
 export {
   createClassSession,
   getMyClassSessions,
@@ -192,4 +218,5 @@ export {
   getAllClassSession,
   updateClassSession,
   deleteClassSession,
+  studentClassSession,
 };
