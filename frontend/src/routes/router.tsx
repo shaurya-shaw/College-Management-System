@@ -21,6 +21,7 @@ import StudentDashboard from "../pages/Dashboard/StudentDashboard";
 import MyCourses from "../pages/studentContent/MyCourses";
 import StudentClasses from "../pages/studentContent/StudentClasses";
 import MyAttendance from "../pages/studentContent/MyAttendance";
+import { ScanQr } from "../pages/studentContent/ScanQr";
 
 export const router = createBrowserRouter([
   {
@@ -73,6 +74,7 @@ export const router = createBrowserRouter([
       { path: "calendar", element: <MyCalendar /> },
       { path: "classes", element: <StudentClasses /> },
       { path: "myAttendance", element: <MyAttendance /> },
+      { path: "scan-QR", element: <ScanQr /> },
     ],
   },
 ]);

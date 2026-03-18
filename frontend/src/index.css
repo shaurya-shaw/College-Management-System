@@ -142,3 +142,39 @@
   min-height: 90px;
   display: block;
 }
+
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+  50% {
+    top: 90%;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+.animate-scan {
+  animation: scan 2s linear infinite;
+  position: absolute;
+}
+
+#reader {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative;
+}
+
+#reader > div {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  inset: 0;
+}
+
+#reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}

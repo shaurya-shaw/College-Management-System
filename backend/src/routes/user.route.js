@@ -5,6 +5,7 @@ import {
   addUser,
   changePassword,
   currentUser,
+  dashboardStats,
   deleteUserById,
   getAllStudents,
   getAllTeachers,
@@ -42,5 +43,8 @@ router
   .route("/api/v1/users/:id")
   .delete(verifyJwt, authorize("ADMIN"), deleteUserById);
 router.route("/api/v1/add-user").post(verifyJwt, authorize("ADMIN"), addUser);
+router
+  .route("/api/v1/dashboard-stats")
+  .get(verifyJwt, authorize("ADMIN"), dashboardStats);
 
 export default router;

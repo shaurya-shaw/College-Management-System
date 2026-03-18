@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAttendanceStore } from "../../store/attendanceStore";
 import { QRCodeCanvas } from "qrcode.react";
 import ErrorToast from "../../components/ErrorToast";
@@ -56,6 +56,17 @@ const QrAttendance = () => {
       {success && (
         <ErrorToast message={success} type="success" onClose={clearSuccess} />
       )}
+
+      <div>
+        <Link
+          to={`/teacher/dashboard`}
+          className=" text-white font-bold py-2 px-4 rounded"
+        >
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-300">
+            Close
+          </button>
+        </Link>
+      </div>
     </div>
   );
 };

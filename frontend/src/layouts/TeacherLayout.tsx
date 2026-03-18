@@ -8,7 +8,7 @@ const TeacherLayout = () => {
       <div className="flex min-h-screen overflow-hidden  bg-[#f2f2f2] text-black">
         {/* Sidebar */}
         <aside className="w-64 bg-white p-6 text-xl text-white rounded-tr-3xl rounded-br-3xl border-black border-0">
-          <h2 className="text-3xl font-bold mb-6 text-black">Admin Menu</h2>
+          <h2 className="text-3xl font-bold mb-6 text-black">Teacher Menu</h2>
           <nav className="flex flex-col gap-4 text-black">
             <NavLink
               className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"

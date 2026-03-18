@@ -1,3 +1,4 @@
+import { Attendance } from "../models/attendance.model.js";
 import { Branch } from "../models/branch.model.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
@@ -339,6 +340,30 @@ const deleteUserById = async (req, res) => {
   }
 };
 
+const dashboardStats = async (req, res) => {
+  try {
+    const totalStudents = await User.countDocuments({ role: "STUDENT" });
+    const totalTeachers = await User.countDocuments({ role: "TEACHER" });
+
+    const present = await Attendance.countDocuments({ isPresent: true });
+    const absent = await Attendance.countDocuments({ isPresent: false });
+    return res.status(200).json({
+      message: "dashboard stats fetched successfully",
+      stats: {
+        totalStudents,
+        totalTeachers,
+        present,
+        absent,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "something went wrong while fetching dashboard stats",
+      error: error.message,
+    });
+  }
+};
+
 export {
   addUser,
   loginUser,
@@ -351,4 +376,5 @@ export {
   getAllTeachers,
   getUserById,
   deleteUserById,
+  dashboardStats,
 };
