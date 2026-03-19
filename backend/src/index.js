@@ -12,7 +12,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://college-management-system-gilt.vercel.app",
+    origin:
+      "college-management-system-git-main-shaurya-shaws-projects.vercel.app",
     credentials: true,
   }),
 );
