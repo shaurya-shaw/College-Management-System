@@ -13,7 +13,7 @@ const app = express();
 app.use(
   cors({
     origin:
-      "college-management-system-git-main-shaurya-shaws-projects.vercel.app",
+      "https://college-management-system-git-main-shaurya-shaws-projects.vercel.app",
     credentials: true,
   }),
 );
