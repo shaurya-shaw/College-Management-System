@@ -10,7 +10,12 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(
+  cors({
+    origin: "https://college-management-system-gilt.vercel.app",
+    credentials: true,
+  }),
+);
 app.use(express.json()); //to parse the req.body which is in json
 app.use(express.urlencoded({ extended: true })); // to parse form data coming from frontend in post request
 app.use(cookieParser()); // to parse the cookies
