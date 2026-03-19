@@ -84,19 +84,29 @@ const getCalendar = async (req, res) => {
     let filter = {};
 
     if (year && month) {
-      // Logic preserved: month - 1 for 0-based index
-      // Added T00:00:00+05:30 to lock the start to India's midnight
-      const start = new Date(`${year}-${month}-01T00:00:00+05:30`);
+      // 1. Ensure month is 2 digits (e.g., "3" becomes "03")
+      const formattedMonth = month.toString().padStart(2, "0");
 
-      // Logic preserved: month, 0 gets the last day of the previous month
-      // We construct the end of the month string and lock it to IST
-      const endMonth = new Date(year, month, 0).getDate();
-      const end = new Date(`${year}-${month}-${endMonth}T23:59:59+05:30`);
+      // 2. Construct the start of the month
+      const start = new Date(`${year}-${formattedMonth}-01T00:00:00+05:30`);
+
+      // 3. Get the last day of the month using your original logic
+      const lastDay = new Date(year, month, 0).getDate();
+      const formattedDay = lastDay.toString().padStart(2, "0");
+
+      // 4. Construct the end of the month
+      const end = new Date(
+        `${year}-${formattedMonth}-${formattedDay}T23:59:59+05:30`,
+      );
+
+      // Validation check: If string construction failed, Date will be 'Invalid Date'
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: "Invalid date parameters" });
+      }
 
       filter.date = { $gte: start, $lte: end };
     }
 
-    // Exact same query and sort
     const calendar = await CalendarDate.find(filter).sort({ date: 1 });
 
     return res.status(200).json({
