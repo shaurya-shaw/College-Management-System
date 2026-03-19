@@ -7,6 +7,7 @@ import {
   getAllClassSession,
   getClassSessionById,
   getMyClassSessions,
+  getTeacherDashboard,
   studentClassSession,
   updateClassSession,
 } from "../controllers/classSession.controller.js";
@@ -33,5 +34,9 @@ router
 router
   .route("/api/v1/student-class-sessions")
   .get(verifyJwt, authorize("STUDENT"), studentClassSession);
+
+router
+  .route("/api/v1/teacher-dashboard")
+  .get(verifyJwt, authorize("TEACHER"), getTeacherDashboard);
 
 export default router;
