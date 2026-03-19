@@ -23,8 +23,8 @@ router
   .post(verifyJwt, authorize("TEACHER"), markAttendance);
 
 router
-  .route("/api/v1/attendance/summary/:studentId")
-  .get(verifyJwt, authorize("ADMIN", "TEACHER", "STUDENT"), attendanceSummary);
+  .route("/api/v1/attendance-summary")
+  .get(verifyJwt, authorize("STUDENT"), attendanceSummary);
 
 router
   .route("/api/v1/generate-qr/:classSessionId/:date")

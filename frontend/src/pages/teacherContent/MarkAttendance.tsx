@@ -17,7 +17,7 @@ const MarkAttendance = () => {
   } = useAttendanceStore();
   const { classId } = useParams();
 
-  const now = new Date("2026-03-27"); //for testing
+  const now = new Date();
 
   useEffect(() => {
     if (classId) fetchAttendance(classId);

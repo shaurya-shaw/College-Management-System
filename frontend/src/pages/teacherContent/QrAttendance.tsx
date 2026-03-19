@@ -19,10 +19,10 @@ const QrAttendance = () => {
 
   useEffect(() => {
     if (classId) {
-      generateQrCode(classId, new Date("2026-03-27"));
+      generateQrCode(classId, new Date());
 
       const interval = setInterval(() => {
-        generateQrCode(classId, new Date("2026-03-27"));
+        generateQrCode(classId, new Date());
       }, 60000); // refresh every 1 min
 
       return () => clearInterval(interval);

@@ -15,110 +15,116 @@ import { useState } from "react";
 const StudentLayout = () => {
   const [open, setOpen] = useState(false);
 
+  // Helper to keep NavLink logic clean and "Cool"
+  const navLinkStyles = ({ isActive }: { isActive: boolean }) => `
+    group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300
+    ${
+      isActive
+        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 -translate-y-0.5"
+        : "text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 hover:translate-x-1"
+    }
+  `;
+
+  const iconStyles = (isActive: boolean) => `
+    transition-transform duration-300 group-hover:scale-110
+    ${isActive ? "text-white" : "text-slate-400 group-hover:text-indigo-500"}
+  `;
+
+  const navItems = [
+    { to: "/student/dashboard", label: "Home", icon: HomeIcon },
+    {
+      to: "/student/myAttendance",
+      label: "My Attendance",
+      icon: ClipboardIcon,
+    },
+    { to: "/student/courses", label: "My Courses", icon: BookOpen },
+    { to: "/student/classes", label: "My Timetable", icon: LayoutDashboard },
+    { to: "/student/scan-QR", label: "Scan QR", icon: QrCodeIcon },
+    { to: "/student/calendar", label: "Calendar", icon: Calendar1Icon },
+  ];
+
   return (
-    <div className="flex min-h-screen bg-[#f2f2f2] text-black">
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-white p-6 flex-col rounded-tr-3xl rounded-br-3xl shadow-md">
-        <h2 className="text-2xl font-bold mb-8">Student Menu</h2>
+    <div className="flex min-h-screen bg-[#f8fafc] text-slate-900 font-sans">
+      {/* Desktop Sidebar - Premium Glass Look */}
+      <aside className="hidden md:flex w-72 bg-white/80 backdrop-blur-md p-8 flex-col rounded-r-[40px] shadow-[20px_0_40px_rgba(0,0,0,0.02)] border-r border-slate-100 z-20">
+        <div className="flex items-center gap-3 mb-12 px-2">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+          </div>
+          <h2 className="text-xl font-black tracking-tight text-slate-800 uppercase">
+            Student Menu
+          </h2>
+        </div>
 
-        <nav className="flex flex-col gap-4 text-lg">
-          <NavLink
-            className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-            to="/student/dashboard"
-          >
-            <HomeIcon className="inline-block mr-2 opacity-60" size={20} />
-            Home
-          </NavLink>
-
-          <NavLink
-            className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-            to="/student/myAttendance"
-          >
-            <ClipboardIcon className="inline-block mr-2 opacity-60" size={20} />
-            My Attendance
-          </NavLink>
-
-          <NavLink
-            className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-            to="/student/courses"
-          >
-            <BookOpen className="inline-block mr-2 opacity-60" size={20} />
-            My Courses
-          </NavLink>
-          <NavLink
-            className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-            to="/student/classes"
-          >
-            <LayoutDashboard
-              className="inline-block mr-2 opacity-60"
-              size={20}
-            />
-            My Timetable
-          </NavLink>
-          <NavLink
-            className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-            to="/student/scan-QR"
-          >
-            <QrCodeIcon className="inline-block mr-2 opacity-60" size={20} />
-            Scan QR
-          </NavLink>
-
-          <NavLink
-            className="border-gray-500  hover:bg-green-100 hover:rounded-2xl p-2 rounded-3xl border-0 border-b-2 transition-colors duration-300"
-            to="/student/calendar"
-          >
-            <Calendar1Icon className="inline-block mr-2 opacity-60" size={20} />
-            Calendar
-          </NavLink>
+        <nav className="flex flex-col gap-2">
+          {navItems.map((item) => (
+            <NavLink key={item.to} to={item.to} className={navLinkStyles}>
+              {({ isActive }) => (
+                <>
+                  <item.icon size={22} className={iconStyles(isActive)} />
+                  <span className="font-bold text-sm tracking-wide">
+                    {item.label}
+                  </span>
+                </>
+              )}
+            </NavLink>
+          ))}
         </nav>
       </aside>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - Slide-in Animation */}
       {open && (
-        <div className="fixed inset-0 z-40 flex md:hidden">
-          {/* overlay */}
+        <div className="fixed inset-0 z-50 flex md:hidden animate-in fade-in duration-300">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
-
-          <aside className="relative w-64 bg-white p-6 shadow-lg">
+          <aside className="relative w-72 bg-white h-full p-8 shadow-2xl animate-in slide-in-from-left duration-500">
             <button
-              className="absolute top-4 right-4"
+              className="absolute top-6 right-6 p-2 rounded-xl bg-slate-100 text-slate-500 hover:rotate-90 transition-transform duration-300"
               onClick={() => setOpen(false)}
             >
-              <X />
+              <X size={20} />
             </button>
 
-            <h2 className="text-2xl font-bold mb-8">Student Menu</h2>
-
-            <nav className="flex flex-col gap-4 text-lg">
-              <NavLink to="/student/dashboard">Home</NavLink>
-              <NavLink to="/student/myAttendance">My Attendance</NavLink>
-              <NavLink to="/student/courses">My Courses</NavLink>
-              <NavLink to="/student/classes">My Timetable</NavLink>
-              <NavLink to="/student/scan-QR">Scan QR</NavLink>
-              <NavLink to="/student/calendar">Calendar</NavLink>
+            <h2 className="text-xl font-black mb-12 text-indigo-600">MENU</h2>
+            <nav className="flex flex-col gap-3">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className={navLinkStyles}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon size={22} className={iconStyles(isActive)} />
+                      <span className="font-bold">{item.label}</span>
+                    </>
+                  )}
+                </NavLink>
+              ))}
             </nav>
           </aside>
         </div>
       )}
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Mobile Menu Button */}
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col relative">
+        {/* Mobile Toggle - Styled like a floating action button */}
         {!open && (
           <button
-            className="md:hidden fixed top-5 left-5 z-50 bg-white p-2 rounded-lg shadow"
+            className="md:hidden fixed bottom-8 right-8 z-50 bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl shadow-indigo-300 active:scale-90 transition-transform"
             onClick={() => setOpen(true)}
           >
-            <Menu />
+            <Menu size={24} />
           </button>
         )}
 
         <NavBar />
 
-        <div className="p-4 md:p-6">
+        {/* Content Wrapper with Fade-in Animation */}
+        <div className="p-4 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <Outlet />
         </div>
       </main>

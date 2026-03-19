@@ -7,6 +7,7 @@ import {
   getAllClassSession,
   getClassSessionById,
   getMyClassSessions,
+  getStudentDashboard,
   getTeacherDashboard,
   studentClassSession,
   updateClassSession,
@@ -38,5 +39,9 @@ router
 router
   .route("/api/v1/teacher-dashboard")
   .get(verifyJwt, authorize("TEACHER"), getTeacherDashboard);
+
+router
+  .route("/api/v1/student-dashboard")
+  .get(verifyJwt, authorize("STUDENT"), getStudentDashboard);
 
 export default router;

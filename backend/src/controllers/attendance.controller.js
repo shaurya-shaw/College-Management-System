@@ -1,5 +1,4 @@
 import { Attendance } from "../models/attendance.model.js";
-import { Enrollment } from "../models/enrollment.model.js";
 import { CalendarDate } from "../models/calendarDate.model.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
@@ -15,7 +14,7 @@ const getStudentsAtendanceSheet = async (req, res) => {
       return res.status(400).json({ message: "class session id is required" });
     }
 
-    const today = new Date("2026-03-27"); // for testing
+    const today = new Date();
 
     const startOfDay = new Date(today);
     startOfDay.setHours(0, 0, 0, 0);
@@ -187,16 +186,13 @@ const myAttendance = async (req, res) => {
 
 const attendanceSummary = async (req, res) => {
   try {
-    const { studentId } = req.params;
-    const userId = new mongoose.Types.ObjectId(studentId);
-
     const summary = await Attendance.aggregate([
       {
-        $match: { user: userId },
+        $match: { user: req.user._id },
       },
       {
         $lookup: {
-          from: "classSessions",
+          from: "classsessions",
           localField: "classSession",
           foreignField: "_id",
           as: "classSession",
@@ -217,7 +213,9 @@ const attendanceSummary = async (req, res) => {
           _id: "$subject._id",
           subjectName: { $first: "$subject.name" },
           totalClasses: { $sum: 1 },
-          present: { $sum: { $cond: [{ $eq: ["$isPresent", true] }, 1, 0] } },
+          present: {
+            $sum: { $cond: [{ $eq: ["$isPresent", true] }, 1, 0] },
+          },
         },
       },
       {

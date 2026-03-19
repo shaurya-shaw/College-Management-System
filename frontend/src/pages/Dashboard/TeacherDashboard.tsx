@@ -39,11 +39,11 @@ export default function TeacherDashboard() {
 
   const { classSession, fetchTeacherDashboard } = useClassSessionStore();
 
-  // const day = new Date()
-  //   .toLocaleDateString("en-US", { weekday: "long" })
-  //   .toUpperCase();
+  const day = new Date()
+    .toLocaleDateString("en-US", { weekday: "long" })
+    .toUpperCase();
 
-  const day = "FRIDAY"; //!testing purposes
+  // const day = "FRIDAY"; //!testing purposes
 
   console.log(day);
 

@@ -40,7 +40,6 @@ import subjectRouter from "./routes/subject.route.js";
 import classSessionRouter from "./routes/classSession.route.js";
 import attendanceRouter from "./routes/attendance.route.js";
 import calendarRouter from "./routes/calendarDate.route.js";
-import enrollmentRouter from "./routes/enrollment.route.js";
 
 app.use(userRouter);
 app.use(branchRouter);
@@ -48,4 +47,3 @@ app.use(subjectRouter);
 app.use(classSessionRouter);
 app.use(attendanceRouter);
 app.use(calendarRouter);
-app.use(enrollmentRouter);

@@ -247,7 +247,7 @@ const getTeacherDashboard = async (req, res) => {
       const endMinutes = timeToMinutes(end);
 
       const now = new Date();
-      // now.setHours(12, 40);             //!testing purposes
+      // now.setHours(12, 40); //!testing purposes
       const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
       if (nowMinutes < startMinutes) return "Not started";
@@ -280,6 +280,68 @@ const getTeacherDashboard = async (req, res) => {
   }
 };
 
+const getStudentDashboard = async (req, res) => {
+  try {
+    const day = req.query.day || "MONDAY";
+
+    const sessions = await ClassSession.find({
+      day: day,
+      branch: req.user.branch,
+    })
+      .populate({ path: "subject", select: "name" })
+      .populate({ path: "teacher", select: "fullName email" })
+      .populate({ path: "branch", select: "name" })
+      .lean();
+
+    const timeToMinutes = (time) => {
+      let [hour, minute] = time.split(":").map(Number);
+
+      // 👇 Convert to 24-hour manually (based on your timetable logic)
+      if (hour < 8) hour += 12; // assume afternoon for 1–7
+
+      return hour * 60 + minute;
+    };
+
+    const getStatus = (timeSlot) => {
+      const [start, end] = timeSlot.split("-");
+
+      const startMinutes = timeToMinutes(start);
+      const endMinutes = timeToMinutes(end);
+
+      const now = new Date();
+      // now.setHours(14, 40); //!testing purposes
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+      if (nowMinutes < startMinutes) return "Not started";
+      if (nowMinutes >= startMinutes && nowMinutes <= endMinutes) {
+        return "Ongoing";
+      }
+      return "Completed";
+    };
+
+    const classesWithStatus = sessions.map((cls) => ({
+      ...cls,
+      status: getStatus(cls.timeSlot),
+    }));
+
+    const sortedClasses = classesWithStatus.sort((a, b) => {
+      const aStart = timeToMinutes(a.timeSlot.split("-")[0]);
+      const bStart = timeToMinutes(b.timeSlot.split("-")[0]);
+      return aStart - bStart;
+    });
+
+    return res.status(200).json({
+      message: "class sessions retrieved successfully",
+      classesWithStatus: sortedClasses,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "something went wrong while retrieving class sessions",
+      error: error.message,
+    });
+  }
+};
+
 export {
   createClassSession,
   getMyClassSessions,
@@ -289,4 +351,5 @@ export {
   deleteClassSession,
   studentClassSession,
   getTeacherDashboard,
+  getStudentDashboard,
 };
