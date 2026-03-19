@@ -4,10 +4,12 @@ const generateCalendar = async (req, res) => {
   try {
     const { year } = req.query;
 
+    // 1. Exact original logic: Delete existing dates for the year first
+    // We use the +05:30 offset to ensure we delete the correct IST range
     await CalendarDate.deleteMany({
       date: {
-        $gte: new Date(`${year}-01-01`),
-        $lte: new Date(`${year}-12-31`),
+        $gte: new Date(`${year}-01-01T00:00:00+05:30`),
+        $lte: new Date(`${year}-12-31T23:59:59+05:30`),
       },
     });
 
@@ -19,11 +21,11 @@ const generateCalendar = async (req, res) => {
       });
     }
 
-    // prevent duplicate year generation
+    // 2. Exact original logic: Duplicate check
     const existing = await CalendarDate.findOne({
       date: {
-        $gte: new Date(`${years}-01-01`),
-        $lte: new Date(`${years}-12-31`),
+        $gte: new Date(`${years}-01-01T00:00:00+05:30`),
+        $lte: new Date(`${years}-12-31T23:59:59+05:30`),
       },
     });
 
@@ -34,24 +36,29 @@ const generateCalendar = async (req, res) => {
     }
 
     const dates = [];
-    const startDate = new Date(Date.UTC(years, 0, 1));
-    const endDate = new Date(Date.UTC(years, 11, 31));
+
+    // 3. Replaced Date.UTC with IST String constructors
+    // This ensures startDate starts at 00:00 IST
+    const startDate = new Date(`${years}-01-01T00:00:00+05:30`);
+    const endDate = new Date(`${years}-12-31T00:00:00+05:30`);
 
     for (
       let date = new Date(startDate);
       date <= endDate;
-      date.setUTCDate(date.getUTCDate() + 1)
+      // .setDate handles the rollover correctly across months
+      date.setDate(date.getDate() + 1)
     ) {
+      // 4. Force dayName to calculate based on India Timezone
       const dayName = date.toLocaleDateString("en-US", {
         weekday: "long",
-        timeZone: "UTC",
+        timeZone: "Asia/Kolkata",
       });
 
       dates.push({
         date: new Date(date),
-        day: dayName,
+        day: dayName, // Keeps your original casing (e.g., "Sunday")
 
-        // mark holidays
+        // 5. Exact original holiday logic
         isHoliday: dayName === "Sunday" || dayName === "Saturday",
       });
     }
@@ -77,12 +84,19 @@ const getCalendar = async (req, res) => {
     let filter = {};
 
     if (year && month) {
-      const start = new Date(year, month - 1, 1);
-      const end = new Date(year, month, 0);
+      // Logic preserved: month - 1 for 0-based index
+      // Added T00:00:00+05:30 to lock the start to India's midnight
+      const start = new Date(`${year}-${month}-01T00:00:00+05:30`);
+
+      // Logic preserved: month, 0 gets the last day of the previous month
+      // We construct the end of the month string and lock it to IST
+      const endMonth = new Date(year, month, 0).getDate();
+      const end = new Date(`${year}-${month}-${endMonth}T23:59:59+05:30`);
 
       filter.date = { $gte: start, $lte: end };
     }
 
+    // Exact same query and sort
     const calendar = await CalendarDate.find(filter).sort({ date: 1 });
 
     return res.status(200).json({

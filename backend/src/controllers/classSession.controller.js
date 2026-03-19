@@ -234,8 +234,8 @@ const getTeacherDashboard = async (req, res) => {
     const timeToMinutes = (time) => {
       let [hour, minute] = time.split(":").map(Number);
 
-      // 👇 Convert to 24-hour manually (based on your timetable logic)
-      if (hour < 8) hour += 12; // assume afternoon for 1–7
+      // assumes afternoon for 1–7
+      if (hour < 8) hour += 12;
 
       return hour * 60 + minute;
     };
@@ -246,9 +246,17 @@ const getTeacherDashboard = async (req, res) => {
       const startMinutes = timeToMinutes(start);
       const endMinutes = timeToMinutes(end);
 
+      // --- IST CONVERSION START ---
       const now = new Date();
-      // now.setHours(12, 40); //!testing purposes
-      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+      // Get IST hours and minutes specifically using the India timezone
+      const istTimeStr = now.toLocaleString("en-US", {
+        timeZone: "Asia/Kolkata",
+      });
+      const istDate = new Date(istTimeStr);
+
+      const nowMinutes = istDate.getHours() * 60 + istDate.getMinutes();
+      // --- IST CONVERSION END ---
 
       if (nowMinutes < startMinutes) return "Not started";
       if (nowMinutes >= startMinutes && nowMinutes <= endMinutes) {
@@ -296,8 +304,8 @@ const getStudentDashboard = async (req, res) => {
     const timeToMinutes = (time) => {
       let [hour, minute] = time.split(":").map(Number);
 
-      // 👇 Convert to 24-hour manually (based on your timetable logic)
-      if (hour < 8) hour += 12; // assume afternoon for 1–7
+      // assumes afternoon for 1–7 based on your timetable logic
+      if (hour < 8) hour += 12;
 
       return hour * 60 + minute;
     };
@@ -308,9 +316,17 @@ const getStudentDashboard = async (req, res) => {
       const startMinutes = timeToMinutes(start);
       const endMinutes = timeToMinutes(end);
 
+      // --- IST CONVERSION START ---
       const now = new Date();
-      // now.setHours(14, 40); //!testing purposes
-      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+      // Forces the calculation to use India Standard Time numbers
+      const istTimeStr = now.toLocaleString("en-US", {
+        timeZone: "Asia/Kolkata",
+      });
+      const istDate = new Date(istTimeStr);
+
+      const nowMinutes = istDate.getHours() * 60 + istDate.getMinutes();
+      // --- IST CONVERSION END ---
 
       if (nowMinutes < startMinutes) return "Not started";
       if (nowMinutes >= startMinutes && nowMinutes <= endMinutes) {

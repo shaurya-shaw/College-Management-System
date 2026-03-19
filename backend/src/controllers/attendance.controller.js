@@ -15,11 +15,15 @@ const getStudentsAtendanceSheet = async (req, res) => {
     }
 
     const today = new Date();
+    const istString = today.toLocaleString("en-US", {
+      timeZone: "Asia/Kolkata",
+    });
+    const todayIst = new Date(istString);
 
-    const startOfDay = new Date(today);
+    const startOfDay = todayIst;
     startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDay = new Date(today);
+    const endOfDay = todayIst;
     endOfDay.setHours(23, 59, 59, 999);
 
     const day = await CalendarDate.findOne({
@@ -101,10 +105,16 @@ const markAttendance = async (req, res) => {
       });
     }
 
-    const startOfDay = new Date(date);
+    const today = new Date();
+    const istString = today.toLocaleString("en-US", {
+      timeZone: "Asia/Kolkata",
+    });
+    const todayIst = new Date(istString);
+
+    const startOfDay = todayIst;
     startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDay = new Date(date);
+    const endOfDay = todayIst;
     endOfDay.setHours(23, 59, 59, 999);
 
     const calendarDate = await CalendarDate.findOne({
@@ -118,7 +128,10 @@ const markAttendance = async (req, res) => {
     }
 
     const day = new Date(date)
-      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLocaleDateString("en-US", {
+        weekday: "long",
+        timeZone: "Asia/Kolkata",
+      })
       .toUpperCase();
 
     const realDay = await ClassSession.findById(classSessionId)
@@ -253,10 +266,16 @@ const generateAttendanceQrCode = async (req, res) => {
         .json({ message: "class session id and calendar date  is required" });
     }
 
-    const startOfDay = new Date(date);
+    const today = new Date();
+    const istString = today.toLocaleString("en-US", {
+      timeZone: "Asia/Kolkata",
+    });
+    const todayIst = new Date(istString);
+
+    const startOfDay = todayIst;
     startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDay = new Date(date);
+    const endOfDay = todayIst;
     endOfDay.setHours(23, 59, 59, 999);
 
     const calendarDate = await CalendarDate.findOne({
@@ -270,7 +289,10 @@ const generateAttendanceQrCode = async (req, res) => {
     }
 
     const day = new Date(date)
-      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLocaleDateString("en-US", {
+        weekday: "long",
+        timeZone: "Asia/Kolkata", // This is the magic line
+      })
       .toUpperCase();
 
     const realDay = await ClassSession.findById(classSessionId)
