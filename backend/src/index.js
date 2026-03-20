@@ -10,13 +10,30 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  "https://college-management-system-gilt.vercel.app", // Your main production URL
+  "https://college-management-system-git-main-shaurya-shaws-projects.vercel.app", // Your branch URL
+  "http://localhost:5173", // Add your local dev server port (e.g., Vite defaults to 5173, React to 3000)
+  "http://localhost:3000",
+];
+
 app.use(
   cors({
-    origin:
-      "https://college-management-system-git-main-shaurya-shaws-projects.vercel.app",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl, or Postman)
+      if (!origin) return callback(null, true);
+
+      // If the origin is in our allowed list, let it pass
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
+
 app.use(express.json()); //to parse the req.body which is in json
 app.use(express.urlencoded({ extended: true })); // to parse form data coming from frontend in post request
 app.use(cookieParser()); // to parse the cookies
