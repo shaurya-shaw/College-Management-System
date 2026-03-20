@@ -2,27 +2,16 @@ import { useForm } from "react-hook-form";
 import { api } from "../services/api";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-// Add a few custom utility classes for keyframe animations (can be added to global CSS if needed)
+// Existing custom utility classes
 const customStyles = `
   @keyframes fade-in-scale {
-    0% {
-      opacity: 0;
-      transform: scale(0.95) translateY(10px);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
+    0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
   }
-
-  .animate-cool-entry {
-    animation: fade-in-scale 0.5s ease-out forwards;
-  }
-
-  .cool-input:focus ~ label {
-    color: #4f46e5; /* indigo-600 */
-  }
+  .animate-cool-entry { animation: fade-in-scale 0.5s ease-out forwards; }
+  .cool-input:focus ~ label { color: #4f46e5; }
 `;
 
 type LoginForm = {
@@ -31,27 +20,32 @@ type LoginForm = {
 };
 
 const Login = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: {},
-  } = useForm<LoginForm>();
+  const { register, handleSubmit } = useForm<LoginForm>();
   const setUser = useAuthStore((state) => state.setUser);
   const navigate = useNavigate();
 
+  // 1. Add the loading state
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = async (data: LoginForm) => {
+    // 2. Start loading immediately upon submit
+    setIsLoading(true);
+
     try {
       const res = await api.post("/login", data);
       console.log("login successfull", res.data);
       setUser(res.data.user);
       const role = res.data.user.role;
 
-      // Unchanged role-based routing logic
       if (role == "TEACHER") navigate("/teacher/dashboard");
       else if (role == "ADMIN") navigate("/admin/dashboard");
       else navigate("/student/dashboard");
     } catch (error: any) {
       console.log("login failed", error);
+      // You can add a toast notification here later!
+    } finally {
+      // 3. Always stop loading, whether it succeeds or fails
+      setIsLoading(false);
     }
   };
 
@@ -59,17 +53,36 @@ const Login = () => {
     <>
       <style>{customStyles}</style>
       <div className="min-h-screen flex items-center justify-center bg-[#0e1015] relative overflow-hidden">
-        {/* Shifting Gradient Blurs - Core "Cool" Visual */}
+        {/* Shifting Gradient Blurs */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div className="absolute top-1/2 left-1/4 w-100 h-100 bg-indigo-600/30 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-pulse delay-75"></div>
           <div className="absolute top-1/4 right-1/4 w-87.5 h-87.5 bg-blue-500/20 rounded-full mix-blend-screen filter blur-[90px] opacity-60 animate-pulse delay-200"></div>
           <div className="absolute -bottom-20 right-1/2 w-125 h-125 bg-indigo-700/25 rounded-full mix-blend-screen filter blur-[120px] opacity-50 animate-pulse delay-150"></div>
         </div>
 
-        {/* Core Login Card Container with Entry Animation */}
+        {/* Core Login Card Container */}
         <div className="max-w-xl w-full p-6 sm:p-10 md:p-12 z-10 animate-cool-entry">
-          <div className="bg-[#161a1f] p-8 sm:p-12 rounded-[40px] shadow-[0_0_80px_rgba(31,41,55,0.4)] border border-gray-800 backdrop-blur-3xl transform transition-all duration-300">
-            {/* Header Section with Icon/Logo Placeholder */}
+          {/* NOTE: Added `relative` and `overflow-hidden` so the loader stays inside the card */}
+          <div className="relative overflow-hidden bg-[#161a1f] p-8 sm:p-12 rounded-[40px] shadow-[0_0_80px_rgba(31,41,55,0.4)] border border-gray-800 backdrop-blur-3xl transform transition-all duration-300">
+            {/* --- NEW: The Cool Loading Overlay --- */}
+            {isLoading && (
+              <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#161a1f]/80 backdrop-blur-md">
+                {/* Multi-ring spinning animation */}
+                <div className="relative flex items-center justify-center w-24 h-24 mb-6">
+                  <div className="absolute inset-0 border-t-4 border-indigo-500 rounded-full animate-spin"></div>
+                  <div className="absolute inset-2 border-r-4 border-blue-500 rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
+                  <div className="absolute inset-4 border-b-4 border-indigo-300 rounded-full animate-spin opacity-50"></div>
+                </div>
+                <h2 className="text-2xl font-bold text-white animate-pulse tracking-wide">
+                  Authenticating
+                </h2>
+                <p className="text-sm text-indigo-400 mt-2 font-medium">
+                  Waking up secure server...
+                </p>
+              </div>
+            )}
+            {/* ------------------------------------- */}
+
             <div className="flex flex-col items-center mb-10">
               <div className="p-3.5 mb-5 bg-gray-800 border border-gray-700 rounded-3xl group transition hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/10">
                 <svg
@@ -96,12 +109,13 @@ const Login = () => {
 
             <form className="space-y-7" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-6">
-                {/* Modern Input Treatment with Hover & Focus Effects */}
+                {/* Email Input */}
                 <div className="relative">
                   <input
                     id="email"
                     type="email"
-                    className="cool-input block w-full px-5 py-4 text-base text-white bg-gray-900 border border-gray-700 rounded-2xl placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 peer hover:border-gray-600"
+                    disabled={isLoading}
+                    className="cool-input block w-full px-5 py-4 text-base text-white bg-gray-900 border border-gray-700 rounded-2xl placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 peer hover:border-gray-600 disabled:opacity-50"
                     {...register("email")}
                     placeholder=" "
                   />
@@ -113,11 +127,13 @@ const Login = () => {
                   </label>
                 </div>
 
+                {/* Password Input */}
                 <div className="relative">
                   <input
                     id="password"
                     type="password"
-                    className="cool-input block w-full px-5 py-4 text-base text-white bg-gray-900 border border-gray-700 rounded-2xl placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 peer hover:border-gray-600"
+                    disabled={isLoading}
+                    className="cool-input block w-full px-5 py-4 text-base text-white bg-gray-900 border border-gray-700 rounded-2xl placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 peer hover:border-gray-600 disabled:opacity-50"
                     {...register("password")}
                     placeholder=" "
                   />
@@ -130,27 +146,30 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Enhanced Submit Button with Pulse and Transition Effects */}
+              {/* 4. Update the Button to handle the loading state */}
               <button
                 type="submit"
-                className="group relative w-full flex justify-center items-center py-4 px-6 text-base font-bold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] transition-all duration-200 ease-in-out shadow-[0_10px_30px_rgba(79,70,229,0.3)] hover:shadow-[0_12px_40px_rgba(79,70,229,0.5)] focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#161a1f] focus:ring-indigo-500 focus:outline-none"
+                disabled={isLoading}
+                className="group relative w-full flex justify-center items-center py-4 px-6 text-base font-bold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] transition-all duration-200 ease-in-out shadow-[0_10px_30px_rgba(79,70,229,0.3)] hover:shadow-[0_12px_40px_rgba(79,70,229,0.5)] focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#161a1f] focus:ring-indigo-500 focus:outline-none disabled:bg-indigo-800 disabled:cursor-not-allowed"
               >
-                Sign In
-                <span className="absolute right-6 transition-transform duration-300 group-hover:translate-x-1.5">
-                  <svg
-                    className="w-5 h-5 text-indigo-100"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                </span>
+                {isLoading ? "Processing..." : "Sign In"}
+                {!isLoading && (
+                  <span className="absolute right-6 transition-transform duration-300 group-hover:translate-x-1.5">
+                    <svg
+                      className="w-5 h-5 text-indigo-100"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      />
+                    </svg>
+                  </span>
+                )}
               </button>
             </form>
           </div>
