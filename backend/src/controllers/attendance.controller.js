@@ -6,6 +6,26 @@ import { calculateDistance } from "../lib/distance.js";
 import { ClassSession } from "../models/classSession.model.js";
 import { User } from "../models/user.model.js";
 
+const IST_OFFSET_MINUTES = 5.5 * 60;
+
+const getCurrentISTDayUTCRange = () => {
+  const now = new Date();
+  const istNow = new Date(now.getTime() + IST_OFFSET_MINUTES * 60 * 1000);
+
+  const year = istNow.getUTCFullYear();
+  const month = istNow.getUTCMonth();
+  const date = istNow.getUTCDate();
+
+  const startOfDayUTC = new Date(
+    Date.UTC(year, month, date) - IST_OFFSET_MINUTES * 60 * 1000,
+  );
+  const endOfDayUTC = new Date(
+    startOfDayUTC.getTime() + 24 * 60 * 60 * 1000 - 1,
+  );
+
+  return { startOfDayUTC, endOfDayUTC };
+};
+
 const getStudentsAtendanceSheet = async (req, res) => {
   try {
     const { classSessionId } = req.params;
@@ -14,29 +34,23 @@ const getStudentsAtendanceSheet = async (req, res) => {
       return res.status(400).json({ message: "class session id is required" });
     }
 
-    const today = new Date();
-    const istString = today.toLocaleString("en-US", {
-      timeZone: "Asia/Kolkata",
-    });
-    const todayIst = new Date(istString);
-
-    const startOfDay = todayIst;
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = todayIst;
-    endOfDay.setHours(23, 59, 59, 999);
+    const { startOfDayUTC, endOfDayUTC } = getCurrentISTDayUTCRange();
 
     const day = await CalendarDate.findOne({
-      date: { $gte: startOfDay, $lte: endOfDay },
+      date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
     });
 
-    console.log(day);
-
-    console.log(day.isHoliday);
+    if (!day) {
+      return res.status(404).json({
+        message: "No calendar date found for today",
+      });
+    }
 
     if (day.isHoliday) {
       return res.status(400).json({ message: "today is a holiday" });
     }
+
+    console.log(day);
 
     const classes = await ClassSession.findById(classSessionId);
 
@@ -105,20 +119,10 @@ const markAttendance = async (req, res) => {
       });
     }
 
-    const today = new Date();
-    const istString = today.toLocaleString("en-US", {
-      timeZone: "Asia/Kolkata",
-    });
-    const todayIst = new Date(istString);
-
-    const startOfDay = todayIst;
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = todayIst;
-    endOfDay.setHours(23, 59, 59, 999);
+    const { startOfDayUTC, endOfDayUTC } = getCurrentISTDayUTCRange();
 
     const calendarDate = await CalendarDate.findOne({
-      date: { $gte: startOfDay, $lte: endOfDay },
+      date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
     });
 
     if (!calendarDate) {
@@ -266,20 +270,10 @@ const generateAttendanceQrCode = async (req, res) => {
         .json({ message: "class session id and calendar date  is required" });
     }
 
-    const today = new Date();
-    const istString = today.toLocaleString("en-US", {
-      timeZone: "Asia/Kolkata",
-    });
-    const todayIst = new Date(istString);
-
-    const startOfDay = todayIst;
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = todayIst;
-    endOfDay.setHours(23, 59, 59, 999);
+    const { startOfDayUTC, endOfDayUTC } = getCurrentISTDayUTCRange();
 
     const calendarDate = await CalendarDate.findOne({
-      date: { $gte: startOfDay, $lte: endOfDay },
+      date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
     });
 
     if (!calendarDate) {
