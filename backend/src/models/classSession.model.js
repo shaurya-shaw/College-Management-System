@@ -14,7 +14,7 @@ const classSessionSchema = new Schema(
         "MONDAY",
         "TUESDAY",
         "WEDNESDAY",
-        "THRUSDAY",
+        "THURSDAY",
         "FRIDAY",
         "SATURDAY",
         "SUNDAY",
