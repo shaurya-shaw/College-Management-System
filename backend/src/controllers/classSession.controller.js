@@ -165,12 +165,11 @@ const updateClassSession = async (req, res) => {
 
 const deleteClassSession = async (req, res) => {
   try {
-    const { classSessionId } = req.params;
-    if (!classSessionId) {
+    const { id } = req.params;
+    if (!id) {
       return res.status(400).json({ message: "class session id is required" });
     }
-    const deletedClassSession =
-      await ClassSession.findByIdAndDelete(classSessionId);
+    const deletedClassSession = await ClassSession.findByIdAndDelete(id);
     if (!deletedClassSession) {
       return res.status(404).json({ message: "class session not found" });
     }

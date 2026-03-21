@@ -125,8 +125,8 @@ const AddClassSession = ({ close }: { close: () => void }) => {
             <option value="WEDNESDAY" className="text-gray-500 ">
               Wednessday
             </option>
-            <option value="THRUSDAY" className="text-gray-500 ">
-              Thrusday
+            <option value="THURSDAY" className="text-gray-500 ">
+              Thursday
             </option>
             <option value="FRIDAY" className="text-gray-500 ">
               Friday
