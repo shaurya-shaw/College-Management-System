@@ -64,6 +64,9 @@ function CustomToolbar({
         </h2>
         <button
           onClick={onGenerate}
+          disabled={true}
+          hidden={true}
+          // Disabled and hidden for now as i m uploading the admin credentials to social media later you can test it by changing it to false
           className="px-3 py-1 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
         >
           + Generate Year
