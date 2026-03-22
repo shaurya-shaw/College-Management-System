@@ -114,7 +114,7 @@ const StudentLayout = () => {
         {/* Mobile Toggle - Styled like a floating action button */}
         {!open && (
           <button
-            className="md:hidden fixed bottom-8 right-8 z-50 bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl shadow-indigo-300 active:scale-90 transition-transform"
+            className="md:hidden fixed top-8 left-8 z-50 bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl shadow-indigo-300 active:scale-90 transition-transform"
             onClick={() => setOpen(true)}
           >
             <Menu size={24} />
