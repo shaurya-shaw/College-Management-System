@@ -24,11 +24,9 @@ const Login = () => {
   const setUser = useAuthStore((state) => state.setUser);
   const navigate = useNavigate();
 
-  // 1. Add the loading state
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: LoginForm) => {
-    // 2. Start loading immediately upon submit
     setIsLoading(true);
 
     try {
@@ -37,14 +35,12 @@ const Login = () => {
       setUser(res.data.user);
       const role = res.data.user.role;
 
-      if (role == "TEACHER") navigate("/teacher/dashboard");
-      else if (role == "ADMIN") navigate("/admin/dashboard");
+      if (role === "TEACHER") navigate("/teacher/dashboard");
+      else if (role === "ADMIN") navigate("/admin/dashboard");
       else navigate("/student/dashboard");
     } catch (error: any) {
       console.log("login failed", error);
-      // You can add a toast notification here later!
     } finally {
-      // 3. Always stop loading, whether it succeeds or fails
       setIsLoading(false);
     }
   };
@@ -62,12 +58,10 @@ const Login = () => {
 
         {/* Core Login Card Container */}
         <div className="max-w-xl w-full p-6 sm:p-10 md:p-12 z-10 animate-cool-entry">
-          {/* NOTE: Added `relative` and `overflow-hidden` so the loader stays inside the card */}
           <div className="relative overflow-hidden bg-[#161a1f] p-8 sm:p-12 rounded-[40px] shadow-[0_0_80px_rgba(31,41,55,0.4)] border border-gray-800 backdrop-blur-3xl transform transition-all duration-300">
-            {/* --- NEW: The Cool Loading Overlay --- */}
+            {/* Cool Loading Overlay */}
             {isLoading && (
               <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#161a1f]/80 backdrop-blur-md">
-                {/* Multi-ring spinning animation */}
                 <div className="relative flex items-center justify-center w-24 h-24 mb-6">
                   <div className="absolute inset-0 border-t-4 border-indigo-500 rounded-full animate-spin"></div>
                   <div className="absolute inset-2 border-r-4 border-blue-500 rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
@@ -81,7 +75,6 @@ const Login = () => {
                 </p>
               </div>
             )}
-            {/* ------------------------------------- */}
 
             <div className="flex flex-col items-center mb-10">
               <div className="p-3.5 mb-5 bg-gray-800 border border-gray-700 rounded-3xl group transition hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/10">
@@ -146,7 +139,6 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* 4. Update the Button to handle the loading state */}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -172,6 +164,40 @@ const Login = () => {
                 )}
               </button>
             </form>
+
+            {/* === DEMO CREDENTIALS BOX (added here) === */}
+            <div className="mt-8 bg-[#1f252b] border border-gray-700 rounded-3xl p-6">
+              <p className="font-medium text-gray-400 mb-4 text-sm text-center">
+                Demo Credentials (for recruiters &amp; testing)
+              </p>
+
+              <div className="space-y-2 text-left max-w-70 mx-auto text-gray-300 text-sm">
+                <p>
+                  <strong className="text-indigo-400">Admin:</strong>{" "}
+                  shaurya@gmail.com / 1234
+                </p>
+                <p>
+                  <strong className="text-indigo-400">Teacher:</strong>{" "}
+                  kalyan@gmail.com / 1234
+                </p>
+                <p>
+                  <strong className="text-indigo-400">Student:</strong>{" "}
+                  surya@gmail.com / 1234
+                </p>
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-gray-700 text-[10px] text-gray-500 leading-tight">
+                Password is same for all roles • Centralized admin control
+                <div className="mt-2 text-[13px] text-gray-200">
+                  <span className="font-medium text-emerald-400">
+                    **Student panel is fully responsive
+                  </span>{" "}
+                  (works perfectly on mobile) • Admin &amp; Teacher panels are
+                  optimized for desktop/laptop Only
+                </div>
+              </div>
+            </div>
+            {/* =========================================== */}
           </div>
         </div>
       </div>
