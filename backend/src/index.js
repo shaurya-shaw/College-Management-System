@@ -38,6 +38,9 @@ app.use(express.json()); //to parse the req.body which is in json
 app.use(express.urlencoded({ extended: true })); // to parse form data coming from frontend in post request
 app.use(cookieParser()); // to parse the cookies
 
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({ message: "Server is healthy" });
+});
 const PORT = process.env.PORT;
 
 const startServer = async () => {
